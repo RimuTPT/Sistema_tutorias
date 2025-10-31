@@ -50,7 +50,15 @@
                         </svg>
                         <span>Exportar Grupo</span>
                     </a>
-                    {{-- ===== FIN DEL CAMBIO ===== --}}
+
+                    <button type="button" id="openDuplicateModal"
+                        class="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-[#2B8A7F] border border-transparent rounded-lg shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h8m-8 4h8m-8 4h6M5 7h.01M5 11h.01M5 15h.01" />
+                        </svg>
+                        <span>Duplicar grupo</span>
+                    </button>
+
 
 
                     {{-- Editar grupo (secondary) --}}
@@ -91,6 +99,110 @@
                     <p class="text-sm text-gray-400 dark:text-neutral-500 mt-1">Marcados como baja</p>
                 </div>
             </div>
+
+            {{-- Modal: Duplicar grupo --}}
+            <div id="duplicateModal" class="fixed inset-0 z-[80] hidden">
+            {{-- Overlay --}}
+            <div id="duplicateOverlay" class="absolute inset-0 bg-black/50 backdrop-blur-[2px]"></div>
+
+            {{-- Dialog --}}
+            <div class="absolute inset-0 flex items-center justify-center p-4">
+                <div class="w-full max-w-lg rounded-2xl border shadow-2xl
+                bg-white dark:bg-neutral-900
+                border-gray-200 dark:border-neutral-700">
+
+                {{-- Header --}}
+                <div class="flex items-start justify-between p-5 border-b border-gray-200 dark:border-neutral-700">
+                    <div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-neutral-100">
+                        Duplicar grupo
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-neutral-400">
+                        Se copiarán el grupo, todos sus alumnos y sus observaciones.
+                    </p>
+                    </div>
+                    <button id="closeDuplicateModal"
+                    class="ml-3 inline-flex items-center justify-center rounded-full p-2
+                        text-gray-500 hover:text-gray-800 hover:bg-gray-100
+                        dark:text-neutral-400 dark:hover:text-neutral-100 dark:hover:bg-neutral-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    </button>
+                </div>
+
+                {{-- Body (Form) --}}
+                <form method="POST" action="{{ route('grupos.duplicar', $grupo->pk_grupo) }}">
+                    @csrf
+                    <div class="p-5 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-neutral-200">
+                        Nombre del nuevo grupo
+                        </label>
+                        <input type="text" name="nombre_grupo" maxlength="255"
+                        value="{{ $grupo->nombre_grupo }} (Copia)"
+                        class="mt-1 w-full rounded-lg border-gray-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 focus:ring-indigo-500 focus:border-indigo-500" />
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-neutral-200">
+                            Cuatrimestre (opcional)
+                        </label>
+                        <input type="text" name="cuatrimestre" maxlength="255"
+                            value="{{ $grupo->cuatrimestre }}"
+                            class="mt-1 w-full rounded-lg border-gray-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 focus:ring-indigo-500 focus:border-indigo-500" />
+                        </div>
+
+                        <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-neutral-200">
+                            Estatus
+                        </label>
+                        <select name="estatus"
+                            class="mt-1 w-full rounded-lg border-gray-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="Activo"  @selected(($grupo->estatus ?? 'Activo')==='Activo')>Activo</option>
+                            <option value="Inactivo" @selected(($grupo->estatus ?? '')==='Inactivo')>Inactivo</option>
+                        </select>
+                        </div>
+                    </div>
+
+                    <label class="inline-flex items-center mt-2 select-none">
+                        <input type="checkbox" name="incluir_observaciones" value="1" checked
+                        class="w-4 h-4 text-indigo-600 bg-white dark:bg-neutral-800 border-gray-300 dark:border-neutral-600 rounded focus:ring-indigo-500 focus:ring-2">
+                        <span class="ml-2 text-sm text-gray-700 dark:text-neutral-300">
+                        Incluir observaciones de alumnos
+                        </span>
+                    </label>
+
+                    <div class="rounded-xl border p-3 text-xs
+                        bg-indigo-50 border-indigo-200 text-indigo-800
+                        dark:bg-indigo-900/40 dark:border-indigo-800 dark:text-indigo-200">
+                        Tip: podrás editar el nombre, cuatrimestre o estatus del nuevo grupo después.
+                    </div>
+                    </div>
+
+                    {{-- Footer --}}
+                    <div class="px-5 pb-5 flex items-center justify-end gap-3">
+                    <button type="button" id="cancelDuplicateModal"
+                        class="px-4 py-2 text-sm font-medium rounded-lg border
+                        bg-white text-gray-700 hover:bg-gray-50
+                        dark:bg-neutral-900 dark:text-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-800">
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                        class="px-4 py-2 text-sm font-medium rounded-lg shadow-sm border
+                        text-white bg-indigo-600 hover:bg-indigo-700 border-indigo-700
+                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-0">
+                        Duplicar ahora
+                    </button>
+                    </div>
+                </form>
+                </div>
+            </div>
+            </div>
+
 
             {{-- Students --}}
             <div class="bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-neutral-700">
@@ -160,4 +272,29 @@
             </div>
         </main>
     </div>
+    <script>
+  (function () {
+    // ...tu código de otros modales...
+
+    // ---- Modal Duplicar Grupo ----
+    const dupModal   = document.getElementById('duplicateModal');
+    const dupOverlay = document.getElementById('duplicateOverlay');
+    const openDup    = document.getElementById('openDuplicateModal');
+    const closeDup   = document.getElementById('closeDuplicateModal');
+    const cancelDup  = document.getElementById('cancelDuplicateModal');
+
+    const openDupFn  = () => dupModal && dupModal.classList.remove('hidden');
+    const closeDupFn = () => dupModal && dupModal.classList.add('hidden');
+
+    if (openDup)   openDup.addEventListener('click', openDupFn);
+    if (dupOverlay) dupOverlay.addEventListener('click', closeDupFn);
+    if (closeDup)  closeDup.addEventListener('click', closeDupFn);
+    if (cancelDup) cancelDup.addEventListener('click', closeDupFn);
+
+    // Cerrar con ESC (ya cierras otros; añadimos este)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDupFn();
+    });
+  })();
+</script>
 </x-layouts.app>

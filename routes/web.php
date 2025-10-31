@@ -24,6 +24,8 @@ Route::get('/', function () {
 })->name('home');
 
 
+
+
 /*
 |--------------------------------------------------------------------------
 | Rutas Protegidas (Requieren autenticación)
@@ -36,11 +38,50 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('encuesta', 'encuesta')->name('encuesta');
     Route::view('canalizaciones', 'canalizaciones')->name('canalizaciones');
 
+    Route::get('encuestas', [DashboardEncuestaController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('encuestas');
+
+Route::post('encuestas/settings', [DashboardEncuestaController::class, 'updateAlumnosEsperados'])
+    ->middleware(['auth', 'verified'])
+    ->name('encuestas.settings.update');
+
+    Route::get('actividades', [ActividadController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('actividades');
+
+Route::get('actividades/reporte', [ActividadController::class, 'generarReporte'])
+    ->middleware(['auth', 'verified'])
+    ->name('actividades.reporte');
+
+Route::get('actividades/create', [ActividadController::class, 'create'])
+    ->middleware(['auth', 'verified'])
+    ->name('actividades.create');
+
+Route::post('actividades', [ActividadController::class, 'store'])
+    ->middleware(['auth', 'verified'])
+    ->name('actividades.store');
+
+Route::get('actividades/{actividad:pk_actividad}', [ActividadController::class, 'show'])
+    ->middleware(['auth', 'verified'])
+    ->name('actividades.show');
+
+Route::get('actividades/{actividad:pk_actividad}/edit', [ActividadController::class, 'edit'])
+    ->middleware(['auth', 'verified'])
+    ->name('actividades.edit');
+
+Route::put('actividades/{actividad:pk_actividad}', [ActividadController::class, 'update'])
+    ->middleware(['auth', 'verified'])
+    ->name('actividades.update');
+
+
+
     // --- GRUPOS ---
     Route::get('grupo', [GrupoController::class, 'index'])->name('grupo');
     
     Route::get('detalle_grupo/{grupo}', [GrupoController::class, 'show'])->name('detalle_grupo');
     Route::get('editar_grupo/{grupo}', [GrupoController::class, 'edit'])->name('editar_grupo');
+    Route::post('grupo/{grupo}/duplicar', [GrupoController::class, 'duplicar'])->name('grupos.duplicar');
     
     // Ruta PUT para actualizar
     Route::put('editar_grupo/{grupo}', [GrupoController::class, 'update'])->name('grupos.update');
