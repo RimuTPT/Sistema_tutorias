@@ -8,7 +8,7 @@ use App\Models\Empresa;
 use App\Models\Alumno;
 use App\Http\Controllers\EmpresaController;
 use App\Models\OpcionEstadia;
-use App\Http\Controllers\ReporteEstadiaController; // <-- ¡AÑADIDO! Importa el controlador del reporte
+use App\Http\Controllers\ReporteEstadiaController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -26,9 +26,6 @@ Route::view('canalizaciones', 'canalizaciones')
     ->middleware(['auth', 'verified'])
     ->name('canalizaciones');
 
-// ===================================================
-// RUTA DE ESTADIAS (OPTIMIZADA)
-// ===================================================
 Route::get('estadias', function () {
     $alumnos = Alumno::with('opcionesEstadia.empresa')->get();
     $empresas = Empresa::all();
@@ -39,9 +36,6 @@ Route::get('estadias', function () {
     ]);
 })->middleware(['auth', 'verified'])->name('estadias');
 
-// ===================================================
-// RUTA PARA ACTUALIZAR OPCIONES DE ALUMNO (CORREGIDA)
-// ===================================================
 Route::put('/alumnos/{alumno}/opciones', function(Request $request, Alumno $alumno) {
 
     $validated = $request->validate([
@@ -71,10 +65,6 @@ Route::put('/alumnos/{alumno}/opciones', function(Request $request, Alumno $alum
     ]);
 })->middleware(['auth', 'verified']);
 
-
-// ==========================================================
-// RUTA PARA ACTUALIZAR ESTATUS DE UNA OPCIÓN (AJAX)
-// ==========================================================
 Route::patch('/opciones-estadia/{opcion}/status', function(Request $request, OpcionEstadia $opcion) {
 
     $validated = $request->validate([
@@ -90,9 +80,6 @@ Route::patch('/opciones-estadia/{opcion}/status', function(Request $request, Opc
 })->middleware(['auth', 'verified'])->name('opciones-estadia.updateStatus');
 
 
-// ===================================================
-// RUTAS DE EMPRESAS
-// ===================================================
 Route::view('empresas/crear', 'layouts.nueva_empresa')
     ->middleware(['auth', 'verified'])
     ->name('empresas.create');
@@ -120,14 +107,6 @@ Route::post('empresas', function (Request $request) {
     return redirect()->route('estadias')->with('success', '¡Empresa registrada con éxito!');
 })->middleware(['auth', 'verified'])->name('empresas.store');
 
-// ===================================================
-// RUTAS DEL REPORTE
-// ===================================================
-// Route::view('estadias/reporte', 'layouts.reporte-estadias') // <-- ¡ELIMINADA! Esta línea causaba el error
-//    ->middleware(['auth', 'verified'])
-//    ->name('estadias.reporte');
-
-// ¡CORREGIDO! Ahora llama al controlador que calcula $stats
 Route::get('estadias/reporte', [ReporteEstadiaController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('estadias.reporte');
@@ -139,9 +118,6 @@ Route::get('estadias/reporte/pdf', function() {
 ->middleware(['auth', 'verified'])
 ->name('estadias.reporte.pdf');
 
-// ===================================================
-// RUTAS DE CONFIGURACIÓN
-// ===================================================
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
@@ -162,10 +138,6 @@ Route::middleware(['auth'])->group(function () {
 
 require __DIR__.'/auth.php';
 
-// Ruta para mostrar el formulario de edición (si tienes una página separada)
-// Route::get('/empresas/{empresa}/edit', [EmpresaController::class, 'edit'])->name('empresas.edit'); // Comentada si no tienes este método
-// Ruta para ACTUALIZAR una empresa (recibe PUT/PATCH)
 Route::put('/empresas/{empresa}', [EmpresaController::class, 'update'])->name('empresas.update');
-// Ruta para ELIMINAR una empresa (recibe DELETE)
 Route::delete('/empresas/{empresa}', [EmpresaController::class, 'destroy'])->name('empresas.destroy');
 
