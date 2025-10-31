@@ -82,6 +82,9 @@ Route::put('actividades/{actividad:pk_actividad}', [ActividadController::class, 
     Route::get('detalle_grupo/{grupo}', [GrupoController::class, 'show'])->name('detalle_grupo');
     Route::get('editar_grupo/{grupo}', [GrupoController::class, 'edit'])->name('editar_grupo');
     Route::post('grupo/{grupo}/duplicar', [GrupoController::class, 'duplicar'])->name('grupos.duplicar');
+    Route::get('crear_grupo', [GrupoController::class, 'create'])->name('grupos.create');   // ← GET del formulario
+    Route::post('grupo', [GrupoController::class, 'store'])->name('grupos.store');          // ← POST para guardar
+
     
     // Ruta PUT para actualizar
     Route::put('editar_grupo/{grupo}', [GrupoController::class, 'update'])->name('grupos.update');

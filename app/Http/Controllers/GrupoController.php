@@ -33,6 +33,26 @@ class GrupoController extends Controller
      * MUESTRA EL DETALLE (Método actualizado)
      * Usamos Route Model Binding (Grupo $grupo)
      */
+
+    public function create()
+    {
+    return view('crear_grupo'); // tu blade de crear
+    }
+    
+    public function store(Request $request)
+    {
+    $data = $request->validate([
+        'nombre_grupo' => 'required|string|max:255',
+        'cuatrimestre' => 'nullable|string|max:255',
+        'estatus'      => 'required|in:Activo,Inactivo',
+    ]);
+
+    $grupo = Grupo::create($data);
+
+    return redirect()
+        ->route('detalle_grupo', $grupo->pk_grupo)
+        ->with('status', 'Grupo creado correctamente.');
+    }
     public function show(Grupo $grupo)
     {
         // Laravel ya hizo el findOrFail() por ti
